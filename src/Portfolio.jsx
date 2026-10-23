@@ -1,1015 +1,755 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState } from "react";
+
+// ─── Design tokens ───────────────────────────────────────────────
+const C = {
+  ink: "#1C2A2C",
+  paper: "#FAF8F4",
+  rust: "#A6482A",
+  rustDark: "#7E3218",
+  rustLight: "#E39272",
+  teal: "#2B6B62",
+  body: "#3A4648",
+  muted: "#5A6466",
+  warm: "#6F655A",
+  rule: "#E0D8CB",
+  navRule: "#E6DFD3",
+  chipBorder: "#DCD3C5",
+  chipText: "#4E463D",
+  chipBg: "#EFE9DF",
+  footerText: "#F3EEE6",
+  footerMuted: "#A9B4B2",
+  footerRule: "#3A4A4C",
+};
+
+const F = {
+  serif: "'Cormorant Garamond', Georgia, serif",
+  sans: "'Hanken Grotesk', system-ui, sans-serif",
+  mono: "'JetBrains Mono', monospace",
+};
+
+const EMAIL = "ramanampamonjysandratra@gmail.com";
+const LINKEDIN = "https://www.linkedin.com/in/rsandratra";
 
 // ─── Language Data ───────────────────────────────────────────────
 const content = {
-  en: {
-    nav: { about: "About", skills: "Skills", experience: "Experience", education: "Education", contact: "Contact" },
-    hero: {
-      greeting: "Hello, I'm",
-      name: "Riantsoa",
-      surname: "Ramanampamonjy",
-      role: "Software Engineer",
-      subtitle: "Building performant web & mobile experiences with Symfony, React & React Native",
-      cta: "Explore my work",
-      download: "Download CV",
-    },
-    about: {
-      title: "About Me",
-      p1: "I'm a passionate Software Engineer based in Antananarivo, Madagascar, with a Master's degree in Big Data from Université Côte d'Azur (Honors).",
-      p2: "With 3+ years of professional experience, I specialize in building robust web applications with Symfony and interactive mobile experiences with React Native. I thrive in Agile environments and love optimizing performance — like reducing a catalog load time from 15 minutes to just 1 second.",
-      p3: "I'm driven by clean code, impactful solutions, and continuous learning.",
-    },
-    skills: {
-      title: "Technical Arsenal",
-      categories: {
-        languages: "Languages & Frameworks",
-        databases: "Databases",
-        tools: "Tools & DevOps",
-        soft: "Soft Skills",
-      },
-    },
-    experience: {
-      title: "Professional Journey",
-      jobs: [
-        {
-          role: "Symfony / React Native Developer",
-          project: "Maison Luciani",
-          company: "Etech Consulting",
-          location: "Antananarivo, Madagascar",
-          period: "Sep 2023 — Jan 2025",
-          highlights: [
-            "Architected the mobile application foundation using React Native",
-            "Developed and integrated REST APIs with Symfony",
-            "Integrated a secure BNP Paribas payment system",
-            "Generated iOS & Android builds via GitLab CI/CD",
-            "Contributed to UML design and functional/technical specifications",
-            "Practiced Agile: stand-ups, sprint planning, reviews & retrospectives",
-          ],
-        },
-        {
-          role: "Symfony Developer",
-          project: "Kill the Tape",
-          company: "Etech Consulting",
-          location: "Antananarivo, Madagascar",
-          period: "Feb 2022 — Jun 2024",
-          highlights: [
-            "Optimized catalog loading from 15 min → 1 sec (900x improvement)",
-            "Refactored legacy features for better performance & maintainability",
-            "Developed new business features from functional & technical specs",
-            "Prepared and deployed application on new server infrastructure",
-          ],
-        },
-        {
-          role: "React Developer",
-          project: "Aro (Insurance — Agriculture/Livestock)",
-          company: "Etech Consulting",
-          location: "Antananarivo, Madagascar",
-          period: "Feb 2022 — Feb 2023",
-          highlights: [
-            "Implemented real-time geolocation map display",
-            "Built user management: authentication, roles & permissions",
-            "Improved HTML → PDF document generation system",
-            "Active participant in Agile ceremonies",
-          ],
-        },
-      ],
-    },
-    education: {
-      title: "Education",
-      degrees: [
-        {
-          degree: "Master 2 MBDS",
-          school: "Université Côte d'Azur",
-          period: "2022 — 2023",
-          detail: "Big Data Specialization — Honors",
-        },
-        {
-          degree: "Licence (Bachelor's)",
-          school: "IT University",
-          period: "2018 — 2021",
-          detail: "Application & Web Development — Merit",
-        },
-      ],
-    },
-    contact: {
-      title: "Let's Connect",
-      subtitle: "I'm always open to new opportunities and collaborations.",
-      email: "Email",
-      phone: "Phone",
-      location: "Location",
-      linkedin: "LinkedIn",
-      send: "Send Message",
-      namePlaceholder: "Your name",
-      emailPlaceholder: "Your email",
-      messagePlaceholder: "Your message...",
-    },
-    footer: "Designed & built with passion",
-  },
   fr: {
-    nav: { about: "À propos", skills: "Compétences", experience: "Expérience", education: "Formation", contact: "Contact" },
+    nav: { work: "Projets", experience: "Expérience", skills: "Compétences", education: "Formation", contact: "Contact" },
     hero: {
-      greeting: "Bonjour, je suis",
-      name: "Riantsoa",
-      surname: "Ramanampamonjy",
-      role: "Ingénieur Logiciel",
-      subtitle: "Je crée des expériences web & mobile performantes avec Symfony, React & React Native",
-      cta: "Découvrir mon travail",
-      download: "Télécharger CV",
+      kicker: "Antananarivo, Madagascar — Full-stack & IA appliquée",
+      role: "Ingénieur Développeur",
+      summary: "Ingénieur développeur avec plus de 5 ans d'expérience en développement full-stack (Symfony, React, Next.js, Java) et sur des projets d'intelligence artificielle appliquée.",
+      ctaContact: "Me contacter",
     },
-    about: {
-      title: "À Propos",
-      p1: "Je suis un Ingénieur Logiciel passionné basé à Antananarivo, Madagascar, titulaire d'un Master en Big Data de l'Université Côte d'Azur (Mention Bien).",
-      p2: "Fort de plus de 3 ans d'expérience professionnelle, je me spécialise dans la construction d'applications web robustes avec Symfony et d'expériences mobiles interactives avec React Native. Je m'épanouis dans les environnements Agile et j'adore l'optimisation des performances — comme réduire un temps de chargement de catalogue de 15 minutes à seulement 1 seconde.",
-      p3: "Je suis motivé par le code propre, les solutions à fort impact et l'apprentissage continu.",
-    },
-    skills: {
-      title: "Arsenal Technique",
-      categories: {
-        languages: "Langages & Frameworks",
-        databases: "Bases de données",
-        tools: "Outils & DevOps",
-        soft: "Savoir-être",
-      },
+    stats: [
+      { value: "5+", label: "années d'expérience en développement" },
+      { value: "1 000+", label: "appels transcrits et analysés par IA" },
+      { value: "90 %+", label: "de précision en transcription Whisper" },
+      { value: "15 min → 1 s", label: "temps de chargement du catalogue" },
+    ],
+    work: {
+      label: "Projets marquants",
+      title: "Des résultats mesurables, du socle technique à la mise en production.",
+      projects: [
+        {
+          client: "Hubera · 2026",
+          metric: "−80 %",
+          metricLabel: "de temps de traitement manuel",
+          name: "EVAL IA — analyse des appels téléconseillers",
+          desc: "Transcription automatique de plus de 1 000 appels avec Whisper et Qwen2.5:14b, et une interface Next.js utilisée chaque jour par l'équipe qualité.",
+          stack: ["Python", "Next.js", "Whisper", "Qwen2.5:14b"],
+        },
+        {
+          client: "Hubera · 2026",
+          metric: "50+",
+          metricLabel: "utilisateurs internes au quotidien",
+          name: "FAMAS — logiciel de gestion d'entreprise",
+          desc: "Socle technique Symfony + Next.js, plus de 15 fonctionnalités métier, suivi client hebdomadaire et mise en production.",
+          stack: ["Next.js", "Symfony", "MySQL"],
+        },
+        {
+          client: "Kill the Tape · Etech",
+          metric: "15 min → 1 s",
+          metricLabel: "temps de chargement du catalogue",
+          name: "Optimisation d'un catalogue Symfony",
+          desc: "Refonte des performances, refactorisation de plus de 20 fonctionnalités et migration vers une nouvelle infrastructure sans interruption de service.",
+          stack: ["Symfony 7", "Twig", "PostgreSQL"],
+        },
+      ],
     },
     experience: {
-      title: "Parcours Professionnel",
+      label: "Expérience",
+      title: "Plus de cinq ans à construire des applications web, mobiles et IA.",
       jobs: [
+        {
+          role: "Développeur Full-Stack (Next.js / Symfony)",
+          company: "Hubera",
+          location: "Antananarivo, Madagascar",
+          period: "Janvier 2026 — aujourd’hui",
+          project: "Projet FAMAS — logiciel de gestion d'entreprise",
+          highlights: [
+            "Conception et mise en place du socle technique, back-end (Symfony) et front-end (Next.js), posant les bases d'une application utilisée au quotidien par plus de 50 utilisateurs internes",
+            "Développement de plus de 15 fonctionnalités métier en lien direct avec les besoins du client",
+            "Organisation de réunions hebdomadaires de suivi avec le client sur plus de 6 mois de collaboration continue",
+            "Déploiement de l'application en préproduction, puis mise en production",
+          ],
+          stack: ["Next.js", "Symfony", "MySQL", "Git", "JIRA"],
+        },
+        {
+          role: "Développeur IA (Python / Next.js)",
+          company: "Hubera",
+          location: "Antananarivo, Madagascar",
+          period: "Février 2026 — juillet 2026",
+          project: "Projet EVAL IA — transcription et analyse d'appels téléphoniques (téléconseillers)",
+          highlights: [
+            "Transcription automatique de plus de 1 000 appels en Python à l'aide du LLM Qwen2.5:14b et d'un modèle entraîné pour ce cas d'usage, réduisant de 80 % le temps de traitement manuel",
+            "Utilisation de Whisper pour la transcription audio des appels, avec un taux de précision supérieur à 90 %",
+            "Développement d'une interface Next.js consultée quotidiennement par l'équipe qualité pour l'analyse de plusieurs centaines d'appels",
+          ],
+          stack: ["Python", "Next.js", "Whisper", "Qwen2.5:14b"],
+        },
+        {
+          role: "Support interne & projets internes (GLPI)",
+          company: "Hubera",
+          location: "Antananarivo, Madagascar",
+          period: "2025 — aujourd’hui",
+          project: null,
+          highlights: [
+            "Support technique interne via GLPI : gestion et résolution de plus de 200 tickets, réduisant de 30 % le temps moyen de résolution",
+            "Développement et maintenance d'une dizaine de projets internes à l'entreprise",
+          ],
+          stack: ["Docker", "PHP", "CodeIgniter", "Symfony"],
+        },
         {
           role: "Développeur Symfony / React Native",
-          project: "Maison Luciani",
-          company: "Etech Consulting",
+          company: "Maison Luciani — Etech Consulting",
           location: "Antananarivo, Madagascar",
-          period: "Sep 2023 — Jan 2025",
+          period: "Septembre 2023 — janvier 2025",
+          project: null,
           highlights: [
-            "Mise en place de la fondation technique de l'application mobile React Native",
-            "Développement et intégration d'APIs REST avec Symfony",
-            "Intégration d'un système de paiement sécurisé BNP Paribas",
-            "Génération des builds iOS & Android via GitLab CI/CD",
-            "Contribution à la conception UML et aux spécifications fonctionnelles/techniques",
-            "Pratique Agile : stand-ups, planification de sprints, revues & rétrospectives",
+            "Mise en place du socle technique de l'application mobile React Native, utilisée par plusieurs milliers d'utilisateurs",
+            "Maintenance évolutive et corrective : réduction de 40 % du nombre de bugs signalés en production",
+            "Développement et intégration de plus de 20 API REST avec Symfony",
+            "Conception UML (diagrammes de séquence) pour l'ensemble des modules métier",
+            "Intégration d’un système de paiement sécurisé BNP Paribas",
+            "Génération et déploiement des builds iOS et Android via GitLab CI/CD, avec un cycle de publication bimensuel",
           ],
+          stack: ["React Native 0.68", "Symfony 7", "Tailwind", "MySQL", "SQLite", "GitLab CI/CD", "Figma"],
         },
         {
           role: "Développeur Symfony",
-          project: "Kill the Tape",
-          company: "Etech Consulting",
+          company: "Kill the Tape — Etech Consulting",
           location: "Antananarivo, Madagascar",
-          period: "Fév 2022 — Juin 2024",
+          period: "Février 2022 — juin 2024",
+          project: null,
           highlights: [
-            "Optimisation du chargement catalogue de 15 min → 1 sec (amélioration x900)",
-            "Refactoring des fonctionnalités existantes pour la performance & maintenabilité",
-            "Développement de nouvelles fonctionnalités métier selon les spécifications",
-            "Préparation et déploiement de l'application sur une nouvelle infrastructure",
+            "Optimisation majeure du temps de chargement du catalogue, passant de 15 minutes à 1 seconde",
+            "Amélioration et refactorisation de plus de 20 fonctionnalités existantes pour la performance et la maintenabilité",
+            "Développement d'une dizaine de nouvelles fonctionnalités métier",
+            "Mise en production de l'application sur une nouvelle infrastructure serveur, sans interruption de service",
           ],
+          stack: ["Symfony 7", "Twig", "PostgreSQL", "SVN", "Git", "Figma"],
         },
         {
-          role: "Développeur React",
-          project: "Aro (Assurance Agriculture/Élevage)",
-          company: "Etech Consulting",
+          role: "Développeur React / Java",
+          company: "Aro (assurance agriculture / élevage) — Etech Consulting",
           location: "Antananarivo, Madagascar",
-          period: "Fév 2022 — Fév 2023",
+          period: "Février 2022 — février 2023",
+          project: null,
           highlights: [
-            "Implémentation d'une carte avec géolocalisation en temps réel",
-            "Gestion utilisateurs : authentification, rôles & permissions",
-            "Amélioration du système de génération HTML → PDF",
-            "Participation active aux cérémonies Agile",
+            "Affichage cartographique avec géolocalisation en temps réel, réduisant de 30 % le temps de recherche des utilisateurs",
+            "Gestion de plus de 1 000 comptes : création, authentification sécurisée, rôles et permissions",
+            "Fiabilisation de la génération de documents HTML → PDF, éliminant plus de 90 % des erreurs de rendu",
+            "Cérémonies Agile sur des sprints de 2 semaines : daily, sprint planning, reviews et rétrospectives",
           ],
+          stack: ["React 18", "Spring Boot", "Java", "Redis", "Tailwind", "Docker"],
         },
       ],
     },
+    skills: {
+      label: "Compétences",
+      title: "Une stack large, du back-end aux modèles de langage.",
+      groups: [
+        { label: "Langages & frameworks", items: ["Symfony", "Next.js", "React", "React Native", "Java", "Spring Boot", "Python", "PHP", "JavaScript", "HTML", "CSS"] },
+        { label: "IA & traitement du langage", items: ["Whisper", "Qwen2.5:14b", "Entraînement de modèles"] },
+        { label: "Bases de données", items: ["MySQL", "PostgreSQL", "Oracle", "MongoDB"] },
+        { label: "Outils & environnements", items: ["Git", "Docker", "JIRA", "SVN", "Claude AI"] },
+      ],
+    },
     education: {
-      title: "Formation",
+      label: "Formation",
       degrees: [
         {
           degree: "Master 2 MBDS",
-          school: "Université Côte d'Azur",
-          period: "2022 — 2023",
-          detail: "Spécialisation Big Data — Mention Bien",
+          school: "Université Côte d’Azur",
+          period: "Janv. 2022 — déc. 2023",
+          detail: "Spécialisation Big Data — mention bien",
         },
         {
           degree: "Licence",
           school: "IT University",
-          period: "2018 — 2021",
-          detail: "Développement Application & Web — Mention Assez Bien",
+          period: "Janv. 2018 — déc. 2021",
+          detail: "Spécialisation développement d'applications web — mention assez bien",
         },
       ],
     },
+    languages: {
+      label: "Langues",
+      list: [
+        { name: "Français", level: "C1" },
+        { name: "Anglais", level: "B2" },
+      ],
+    },
     contact: {
-      title: "Connectons-nous",
-      subtitle: "Je suis toujours ouvert aux nouvelles opportunités et collaborations.",
-      email: "Email",
+      label: "Contact",
+      title: "Travaillons ensemble.",
+      email: "E-mail",
       phone: "Téléphone",
       location: "Localisation",
-      linkedin: "LinkedIn",
-      send: "Envoyer",
-      namePlaceholder: "Votre nom",
-      emailPlaceholder: "Votre email",
-      messagePlaceholder: "Votre message...",
+      backTop: "Retour en haut ↑",
     },
-    footer: "Conçu & développé avec passion",
+  },
+  en: {
+    nav: { work: "Work", experience: "Experience", skills: "Skills", education: "Education", contact: "Contact" },
+    hero: {
+      kicker: "Antananarivo, Madagascar — Full-stack & applied AI",
+      role: "Software Engineer",
+      summary: "Software engineer with 5+ years of experience in full-stack development (Symfony, React, Next.js, Java) and applied artificial intelligence projects.",
+      ctaContact: "Get in touch",
+    },
+    stats: [
+      { value: "5+", label: "years of development experience" },
+      { value: "1 000+", label: "calls transcribed and analysed with AI" },
+      { value: "90 %+", label: "Whisper transcription accuracy" },
+      { value: "15 min → 1 s", label: "catalogue load time" },
+    ],
+    work: {
+      label: "Selected work",
+      title: "Measurable results, from technical foundation to production.",
+      projects: [
+        {
+          client: "Hubera · 2026",
+          metric: "−80 %",
+          metricLabel: "manual processing time",
+          name: "EVAL IA — call-centre call analysis",
+          desc: "Automatic transcription of 1,000+ calls with Whisper and Qwen2.5:14b, plus a Next.js interface used daily by the quality team.",
+          stack: ["Python", "Next.js", "Whisper", "Qwen2.5:14b"],
+        },
+        {
+          client: "Hubera · 2026",
+          metric: "50+",
+          metricLabel: "daily internal users",
+          name: "FAMAS — business management software",
+          desc: "Symfony + Next.js foundation, 15+ business features, weekly client follow-up and production release.",
+          stack: ["Next.js", "Symfony", "MySQL"],
+        },
+        {
+          client: "Kill the Tape · Etech",
+          metric: "15 min → 1 s",
+          metricLabel: "catalogue load time",
+          name: "Symfony catalogue optimisation",
+          desc: "Performance overhaul, 20+ features refactored and migration to a new infrastructure with zero downtime.",
+          stack: ["Symfony 7", "Twig", "PostgreSQL"],
+        },
+      ],
+    },
+    experience: {
+      label: "Experience",
+      title: "Five+ years building web, mobile and AI applications.",
+      jobs: [
+        {
+          role: "Full-Stack Developer (Next.js / Symfony)",
+          company: "Hubera",
+          location: "Antananarivo, Madagascar",
+          period: "January 2026 — present",
+          project: "FAMAS project — business management software",
+          highlights: [
+            "Designed and set up the technical foundation, back-end (Symfony) and front-end (Next.js), for an application used daily by 50+ internal users",
+            "Built 15+ business features directly driven by client needs",
+            "Ran weekly follow-up meetings with the client over 6+ months of continuous collaboration",
+            "Deployed the application to pre-production, then to production",
+          ],
+          stack: ["Next.js", "Symfony", "MySQL", "Git", "JIRA"],
+        },
+        {
+          role: "AI Developer (Python / Next.js)",
+          company: "Hubera",
+          location: "Antananarivo, Madagascar",
+          period: "February 2026 — July 2026",
+          project: "EVAL IA project — transcription and analysis of call-centre phone calls",
+          highlights: [
+            "Automatically transcribed 1,000+ calls in Python using the Qwen2.5:14b LLM and a model trained for this use case, cutting manual processing time by 80%",
+            "Used Whisper for call audio transcription, with accuracy above 90%",
+            "Built a Next.js interface used daily by the quality team to analyse hundreds of calls",
+          ],
+          stack: ["Python", "Next.js", "Whisper", "Qwen2.5:14b"],
+        },
+        {
+          role: "Internal Support & Internal Projects (GLPI)",
+          company: "Hubera",
+          location: "Antananarivo, Madagascar",
+          period: "2025 — present",
+          project: null,
+          highlights: [
+            "Internal technical support via GLPI: handled and resolved 200+ tickets, cutting average resolution time by 30%",
+            "Developed and maintained around ten internal company projects",
+          ],
+          stack: ["Docker", "PHP", "CodeIgniter", "Symfony"],
+        },
+        {
+          role: "Symfony / React Native Developer",
+          company: "Maison Luciani — Etech Consulting",
+          location: "Antananarivo, Madagascar",
+          period: "September 2023 — January 2025",
+          project: null,
+          highlights: [
+            "Set up the technical foundation of the React Native mobile app, used by several thousand users",
+            "Evolutive and corrective maintenance: 40% fewer bugs reported in production",
+            "Built and integrated 20+ REST APIs with Symfony",
+            "UML design (sequence diagrams) for every business module",
+            "Integrated a secure BNP Paribas payment system",
+            "Generated and shipped iOS and Android builds through GitLab CI/CD, moving to a twice-monthly release cycle",
+          ],
+          stack: ["React Native 0.68", "Symfony 7", "Tailwind", "MySQL", "SQLite", "GitLab CI/CD", "Figma"],
+        },
+        {
+          role: "Symfony Developer",
+          company: "Kill the Tape — Etech Consulting",
+          location: "Antananarivo, Madagascar",
+          period: "February 2022 — June 2024",
+          project: null,
+          highlights: [
+            "Major catalogue load-time optimisation, from 15 minutes down to 1 second",
+            "Improved and refactored 20+ existing features for performance and maintainability",
+            "Built around ten new business features",
+            "Moved the application to a new server infrastructure with zero downtime",
+          ],
+          stack: ["Symfony 7", "Twig", "PostgreSQL", "SVN", "Git", "Figma"],
+        },
+        {
+          role: "React / Java Developer",
+          company: "Aro (agriculture / livestock insurance) — Etech Consulting",
+          location: "Antananarivo, Madagascar",
+          period: "February 2022 — February 2023",
+          project: null,
+          highlights: [
+            "Built map display with real-time geolocation, cutting user search time by 30%",
+            "Managed 1,000+ user accounts: creation, secure authentication, roles and permissions",
+            "Hardened HTML → PDF document generation, eliminating 90%+ of rendering errors",
+            "Agile ceremonies on 2-week sprints: dailies, sprint planning, reviews and retrospectives",
+          ],
+          stack: ["React 18", "Spring Boot", "Java", "Redis", "Tailwind", "Docker"],
+        },
+      ],
+    },
+    skills: {
+      label: "Skills",
+      title: "A broad stack, from back-end to language models.",
+      groups: [
+        { label: "Languages & frameworks", items: ["Symfony", "Next.js", "React", "React Native", "Java", "Spring Boot", "Python", "PHP", "JavaScript", "HTML", "CSS"] },
+        { label: "AI & language processing", items: ["Whisper", "Qwen2.5:14b", "Model training"] },
+        { label: "Databases", items: ["MySQL", "PostgreSQL", "Oracle", "MongoDB"] },
+        { label: "Tools & environments", items: ["Git", "Docker", "JIRA", "SVN", "Claude AI"] },
+      ],
+    },
+    education: {
+      label: "Education",
+      degrees: [
+        {
+          degree: "Master 2 MBDS",
+          school: "Université Côte d’Azur",
+          period: "Jan 2022 — Dec 2023",
+          detail: "Big Data specialisation — with honours (bien)",
+        },
+        {
+          degree: "Bachelor's degree",
+          school: "IT University",
+          period: "Jan 2018 — Dec 2021",
+          detail: "Web application development specialisation — with honours (assez bien)",
+        },
+      ],
+    },
+    languages: {
+      label: "Languages",
+      list: [
+        { name: "French", level: "C1" },
+        { name: "English", level: "B2" },
+      ],
+    },
+    contact: {
+      label: "Contact",
+      title: "Let's work together.",
+      email: "Email",
+      phone: "Phone",
+      location: "Location",
+      backTop: "Back to top ↑",
+    },
   },
 };
 
-const skillsData = {
-  languages: [
-    { name: "Symfony", level: 95, icon: "🎵" },
-    { name: "React", level: 90, icon: "⚛️" },
-    { name: "React Native", level: 88, icon: "📱" },
-    { name: "PHP", level: 93, icon: "🐘" },
-    { name: "JavaScript", level: 90, icon: "✨" },
-    { name: "Java", level: 75, icon: "☕" },
-  ],
-  databases: [
-    { name: "MySQL", level: 90, icon: "🗄️" },
-    { name: "PostgreSQL", level: 85, icon: "🐘" },
-    { name: "MongoDB", level: 78, icon: "🍃" },
-    { name: "Oracle", level: 70, icon: "🔴" },
-  ],
-  tools: [
-    { name: "Git", level: 92, icon: "🔀" },
-    { name: "Docker", level: 85, icon: "🐳" },
-    { name: "GitLab CI/CD", level: 82, icon: "🚀" },
-    { name: "JIRA", level: 88, icon: "📋" },
-    { name: "SVN", level: 75, icon: "📂" },
-  ],
-  soft: [
-    { name: "Agile / Scrum", level: 92, icon: "🔄" },
-    { name: "UML Design", level: 85, icon: "📐" },
-    { name: "REST API Design", level: 90, icon: "🔗" },
-    { name: "Problem Solving", level: 95, icon: "🧩" },
-  ],
+// ─── Shared styles ──────────────────────────────────────────────
+const container = { maxWidth: "1160px", margin: "0 auto" };
+
+const sectionLabel = {
+  margin: 0, fontSize: "13px", fontWeight: 600, letterSpacing: "0.28em",
+  textTransform: "uppercase", color: C.rust,
 };
 
-// ─── Animated Background Particles ──────────────────────────────
-const ParticleField = () => {
-  const canvasRef = useRef(null);
-  const particles = useRef([]);
-  const mouse = useRef({ x: -1000, y: -1000 });
-  const raf = useRef(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    let w = (canvas.width = window.innerWidth);
-    let h = (canvas.height = window.innerHeight);
-
-    const count = Math.min(80, Math.floor((w * h) / 15000));
-    particles.current = Array.from({ length: count }, () => ({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: (Math.random() - 0.5) * 0.4,
-      r: Math.random() * 2 + 1,
-      o: Math.random() * 0.4 + 0.1,
-    }));
-
-    const draw = () => {
-      ctx.clearRect(0, 0, w, h);
-      const pts = particles.current;
-      for (let i = 0; i < pts.length; i++) {
-        const p = pts[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < 0 || p.x > w) p.vx *= -1;
-        if (p.y < 0 || p.y > h) p.vy *= -1;
-
-        const dx = mouse.current.x - p.x;
-        const dy = mouse.current.y - p.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 150) {
-          p.x -= dx * 0.01;
-          p.y -= dy * 0.01;
-        }
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(212,175,55,${p.o})`;
-        ctx.fill();
-
-        for (let j = i + 1; j < pts.length; j++) {
-          const q = pts[j];
-          const d = Math.hypot(p.x - q.x, p.y - q.y);
-          if (d < 120) {
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(q.x, q.y);
-            ctx.strokeStyle = `rgba(212,175,55,${0.08 * (1 - d / 120)})`;
-            ctx.stroke();
-          }
-        }
-      }
-      raf.current = requestAnimationFrame(draw);
-    };
-
-    const onResize = () => {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
-    };
-    const onMouse = (e) => {
-      mouse.current = { x: e.clientX, y: e.clientY };
-    };
-
-    window.addEventListener("resize", onResize);
-    window.addEventListener("mousemove", onMouse);
-    draw();
-
-    return () => {
-      cancelAnimationFrame(raf.current);
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("mousemove", onMouse);
-    };
-  }, []);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        pointerEvents: "none",
-        zIndex: 0,
-      }}
-    />
-  );
+const sectionTitle = {
+  margin: 0, fontFamily: F.serif, fontSize: "40px", fontWeight: 500, lineHeight: 1.1,
+  color: C.ink, flex: "999 1 480px", maxWidth: "760px",
 };
 
-// ─── Intersection Observer Hook ─────────────────────────────────
-const useInView = (threshold = 0.15) => {
-  const ref = useRef(null);
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) { setInView(true); obs.unobserve(el); } },
-      { threshold }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [threshold]);
-  return [ref, inView];
-};
+// ─── Icons ──────────────────────────────────────────────────────
+const ArrowRight = () => (
+  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5 12h14" /><path d="M13 6l6 6-6 6" />
+  </svg>
+);
 
-// ─── Skill Bar Component ────────────────────────────────────────
-const SkillBar = ({ name, level, icon, delay, inView }) => (
+const ArrowUpRight = () => (
+  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M7 17L17 7" /><path d="M8 7h9v9" />
+  </svg>
+);
+
+// ─── Small components ───────────────────────────────────────────
+const SectionHeading = ({ label, title, mb = "48px" }) => (
   <div style={{
-    display: "flex", alignItems: "center", gap: "12px", marginBottom: "14px",
-    opacity: inView ? 1 : 0, transform: inView ? "translateX(0)" : "translateX(-30px)",
-    transition: `all 0.6s cubic-bezier(.22,1,.36,1) ${delay}s`,
+    display: "flex", flexWrap: "wrap", alignItems: "baseline", justifyContent: "space-between",
+    gap: "12px 32px", marginBottom: mb,
   }}>
-    <span style={{ fontSize: "20px", width: "28px", textAlign: "center" }}>{icon}</span>
-    <div style={{ flex: 1 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-        <span style={{ fontSize: "13px", fontWeight: 600, color: "#e8e0d0", fontFamily: "'DM Sans', sans-serif" }}>{name}</span>
-        <span style={{ fontSize: "12px", color: "#d4af37", fontFamily: "'JetBrains Mono', monospace" }}>{level}%</span>
-      </div>
-      <div style={{ height: "6px", borderRadius: "3px", background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
-        <div style={{
-          height: "100%", borderRadius: "3px",
-          background: "linear-gradient(90deg, #d4af37, #f0d060)",
-          width: inView ? `${level}%` : "0%",
-          transition: `width 1.2s cubic-bezier(.22,1,.36,1) ${delay + 0.2}s`,
-        }} />
-      </div>
-    </div>
+    <h2 style={sectionLabel}>{label}</h2>
+    <p style={sectionTitle}>{title}</p>
   </div>
 );
 
-// ─── Timeline Card ──────────────────────────────────────────────
-const TimelineCard = ({ job, index, inView }) => (
-  <div style={{
-    position: "relative", paddingLeft: "40px", paddingBottom: "48px",
-    opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(40px)",
-    transition: `all 0.7s cubic-bezier(.22,1,.36,1) ${index * 0.2}s`,
+const StackChip = ({ name }) => (
+  <span style={{
+    fontFamily: F.mono, fontSize: "12px", color: C.chipText,
+    border: `1px solid ${C.chipBorder}`, borderRadius: "4px", padding: "4px 8px",
   }}>
-    {/* Timeline line */}
-    <div style={{
-      position: "absolute", left: "8px", top: "12px", bottom: 0, width: "2px",
-      background: "linear-gradient(to bottom, #d4af37, rgba(212,175,55,0.1))",
-    }} />
-    {/* Timeline dot */}
-    <div style={{
-      position: "absolute", left: "0", top: "6px", width: "18px", height: "18px",
-      borderRadius: "50%", border: "2px solid #d4af37", background: "#0d0d0d",
-      boxShadow: "0 0 12px rgba(212,175,55,0.3)",
-    }} />
-    <div style={{
-      background: "linear-gradient(135deg, rgba(212,175,55,0.06), rgba(255,255,255,0.02))",
-      border: "1px solid rgba(212,175,55,0.12)", borderRadius: "16px", padding: "28px",
-      backdropFilter: "blur(10px)",
-    }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "8px", marginBottom: "8px" }}>
-        <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#d4af37", margin: 0, fontFamily: "'Playfair Display', serif" }}>{job.role}</h3>
-        <span style={{ fontSize: "12px", color: "#999", fontFamily: "'JetBrains Mono', monospace", whiteSpace: "nowrap", background: "rgba(212,175,55,0.1)", padding: "4px 10px", borderRadius: "20px" }}>{job.period}</span>
-      </div>
-      <p style={{ fontSize: "14px", color: "#b8a070", margin: "0 0 4px", fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}>{job.project}</p>
-      <p style={{ fontSize: "12px", color: "#777", margin: "0 0 16px", fontFamily: "'DM Sans', sans-serif" }}>{job.company} · {job.location}</p>
-      <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
-        {job.highlights.map((h, i) => (
-          <li key={i} style={{
-            fontSize: "13px", color: "#c0b89a", lineHeight: 1.7, paddingLeft: "18px", position: "relative",
-            fontFamily: "'DM Sans', sans-serif", marginBottom: "4px",
-          }}>
-            <span style={{ position: "absolute", left: 0, color: "#d4af37" }}>›</span>
-            {h}
-          </li>
-        ))}
-      </ul>
+    {name}
+  </span>
+);
+
+const SkillChip = ({ name }) => (
+  <span style={{
+    fontSize: "14px", fontWeight: 500, color: C.ink, background: C.chipBg,
+    borderRadius: "4px", padding: "6px 10px",
+  }}>
+    {name}
+  </span>
+);
+
+const ProjectCard = ({ project }) => (
+  <article style={{
+    display: "flex", flexDirection: "column", gap: "14px",
+    borderTop: `2px solid ${C.ink}`, paddingTop: "24px",
+  }}>
+    <span style={{ fontFamily: F.mono, fontSize: "12px", color: C.teal }}>{project.client}</span>
+    <span style={{ fontFamily: F.serif, fontSize: "60px", fontWeight: 600, lineHeight: 1, color: C.rust }}>{project.metric}</span>
+    <span style={{ fontSize: "14px", color: C.muted, marginTop: "-6px" }}>{project.metricLabel}</span>
+    <h3 style={{ margin: "12px 0 0", fontSize: "22px", fontWeight: 600, lineHeight: 1.3, color: C.ink }}>{project.name}</h3>
+    <p style={{ margin: 0, fontSize: "16px", lineHeight: 1.6, color: C.body }}>{project.desc}</p>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "4px" }}>
+      {project.stack.map((s) => <StackChip key={s} name={s} />)}
     </div>
-  </div>
+  </article>
+);
+
+const ExperienceItem = ({ job }) => (
+  <article style={{
+    display: "flex", flexWrap: "wrap", gap: "16px 48px", padding: "40px 0",
+    borderTop: `1px solid ${C.rule}`,
+  }}>
+    <div style={{ flex: "1 1 240px", display: "flex", flexDirection: "column", gap: "6px" }}>
+      <span style={{ fontSize: "15px", fontStyle: "italic", color: C.warm }}>{job.period}</span>
+      <span style={{ fontSize: "16px", fontWeight: 600, color: C.teal }}>{job.company}</span>
+      <span style={{ fontSize: "14px", color: C.warm }}>{job.location}</span>
+    </div>
+    <div style={{ flex: "999 1 560px", minWidth: 0, display: "flex", flexDirection: "column", gap: "12px" }}>
+      <h3 style={{ margin: 0, fontSize: "24px", fontWeight: 600, lineHeight: 1.25, color: C.ink }}>{job.role}</h3>
+      {job.project && (
+        <p style={{ margin: 0, fontSize: "16px", fontWeight: 500, color: C.ink }}>{job.project}</p>
+      )}
+      <ul style={{
+        margin: "4px 0 0", padding: "0 0 0 20px", display: "flex", flexDirection: "column", gap: "8px",
+        fontSize: "16px", lineHeight: 1.6, color: C.body,
+      }}>
+        {job.highlights.map((h, i) => <li key={i} style={{ paddingLeft: "4px" }}>{h}</li>)}
+      </ul>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "8px" }}>
+        {job.stack.map((s) => <StackChip key={s} name={s} />)}
+      </div>
+    </div>
+  </article>
 );
 
 // ─── Main Portfolio ─────────────────────────────────────────────
 export default function Portfolio() {
-  const [lang, setLang] = useState("en");
-  const [scrollY, setScrollY] = useState(0);
-  const [activeSection, setActiveSection] = useState("hero");
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [heroLoaded, setHeroLoaded] = useState(false);
+  const [lang, setLang] = useState("fr");
   const t = content[lang];
 
-  useEffect(() => {
-    const timer = setTimeout(() => setHeroLoaded(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
+  const navItems = ["work", "experience", "skills", "education", "contact"];
 
-  useEffect(() => {
-    const onScroll = () => {
-      setScrollY(window.scrollY);
-      const sections = ["hero", "about", "skills", "experience", "education", "contact"];
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const el = document.getElementById(sections[i]);
-        if (el && el.getBoundingClientRect().top < window.innerHeight * 0.4) {
-          setActiveSection(sections[i]);
-          break;
-        }
-      }
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  const scrollTo = useCallback((id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-    setMenuOpen(false);
-  }, []);
-
-  const [aboutRef, aboutInView] = useInView();
-  const [skillsRef, skillsInView] = useInView();
-  const [expRef, expInView] = useInView();
-  const [eduRef, eduInView] = useInView();
-  const [contactRef, contactInView] = useInView();
-
-  const navItems = ["about", "skills", "experience", "education", "contact"];
+  const contactItems = [
+    { label: t.contact.email, value: EMAIL, href: `mailto:${EMAIL}`, breakAll: true },
+    { label: t.contact.phone, value: "+261 34 18 258 32", href: "tel:+261341825832" },
+    { label: "LinkedIn", value: "linkedin.com/in/rsandratra", href: LINKEDIN },
+    { label: t.contact.location, value: "Antananarivo 101, Madagascar", href: null },
+  ];
 
   return (
-    <div style={{
-      minHeight: "100vh", background: "#0a0a0a", color: "#e8e0d0", margin: 0, padding: 0,
-      fontFamily: "'DM Sans', sans-serif", overflowX: "hidden",
+    <div lang={lang} style={{
+      fontFamily: F.sans, color: C.ink, background: C.paper, minHeight: "100vh", width: "100%",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
 
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        *, *::before, *::after { box-sizing: border-box; }
         html { scroll-behavior: smooth; }
-        body { background: #0a0a0a; overflow-x: hidden; }
+        body { margin: 0; background: ${C.paper}; }
 
-        ::selection { background: rgba(212,175,55,0.3); color: #fff; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0a0a0a; }
-        ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 3px; }
+        ::selection { background: ${C.chipBg}; color: ${C.ink}; }
 
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-20px) rotate(2deg); }
-        }
-        @keyframes pulse-glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(212,175,55,0.2); }
-          50% { box-shadow: 0 0 40px rgba(212,175,55,0.4); }
-        }
-        @keyframes text-shimmer {
-          0% { background-position: -200% center; }
-          100% { background-position: 200% center; }
-        }
-        @keyframes typing {
-          from { width: 0; }
-          to { width: 100%; }
-        }
-        @keyframes blink-caret {
-          50% { border-color: transparent; }
-        }
-        @keyframes grain {
-          0%, 100% { transform: translate(0,0); }
-          10% { transform: translate(-5%,-10%); }
-          20% { transform: translate(-15%,5%); }
-          30% { transform: translate(7%,-25%); }
-          40% { transform: translate(-5%,25%); }
-          50% { transform: translate(-15%,10%); }
-          60% { transform: translate(15%,0%); }
-          70% { transform: translate(0%,15%); }
-          80% { transform: translate(3%,35%); }
-          90% { transform: translate(-10%,10%); }
-        }
+        #top, #work, #experience, #skills, #education, #contact { scroll-margin-top: 72px; }
 
-        .grain-overlay {
-          position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-          pointer-events: none; z-index: 1; opacity: 0.6;
-          animation: grain 8s steps(10) infinite;
-        }
+        .pf-link { color: ${C.rust}; text-decoration: none; transition: color 0.2s ease; }
+        .pf-link:hover { color: ${C.rustDark}; }
 
-        .nav-link {
-          background: none; border: none; color: #888; font-size: 13px; cursor: pointer;
-          font-family: 'JetBrains Mono', monospace; padding: 8px 16px; border-radius: 20px;
-          transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
-          font-weight: 400;
-        }
-        .nav-link:hover { color: #d4af37; background: rgba(212,175,55,0.08); }
-        .nav-link.active { color: #d4af37; background: rgba(212,175,55,0.12); }
+        .nav-link { color: ${C.ink}; text-decoration: none; padding: 10px 0; transition: color 0.2s ease; }
+        .nav-link:hover { color: ${C.rust}; }
 
         .lang-btn {
-          background: none; border: 1px solid rgba(212,175,55,0.3); color: #d4af37;
-          font-size: 12px; cursor: pointer; padding: 6px 14px; border-radius: 20px;
-          font-family: 'JetBrains Mono', monospace; transition: all 0.3s ease;
-          font-weight: 500; letter-spacing: 1px;
+          min-width: 44px; height: 36px; border: 0; border-radius: 999px; cursor: pointer;
+          font-family: ${F.mono}; font-size: 13px; font-weight: 500;
+          background: transparent; color: ${C.ink}; transition: background 0.2s ease, color 0.2s ease;
         }
-        .lang-btn:hover { background: rgba(212,175,55,0.15); border-color: #d4af37; }
+        .lang-btn.active { background: ${C.ink}; color: ${C.paper}; }
 
-        .hero-cta {
-          display: inline-flex; align-items: center; gap: 10px; padding: 16px 36px;
-          background: linear-gradient(135deg, #d4af37, #c49b2a); color: #0a0a0a;
-          border: none; border-radius: 50px; font-size: 15px; font-weight: 700;
-          cursor: pointer; font-family: 'DM Sans', sans-serif; letter-spacing: 0.5px;
-          transition: all 0.4s cubic-bezier(.22,1,.36,1); box-shadow: 0 4px 24px rgba(212,175,55,0.3);
+        .cta {
+          display: flex; align-items: center; justify-content: space-between; gap: 12px;
+          min-height: 52px; padding: 0 22px; border-radius: 6px; font-weight: 600; font-size: 16px;
+          text-decoration: none; transition: background 0.2s ease, color 0.2s ease;
         }
-        .hero-cta:hover {
-          transform: translateY(-3px); box-shadow: 0 8px 40px rgba(212,175,55,0.5);
-          background: linear-gradient(135deg, #e0c050, #d4af37);
-        }
+        .cta-solid { background: ${C.ink}; color: ${C.paper}; }
+        .cta-solid:hover { background: ${C.rust}; color: ${C.paper}; }
+        .cta-outline { border: 1px solid ${C.ink}; color: ${C.ink}; }
+        .cta-outline:hover { background: ${C.ink}; color: ${C.paper}; }
 
-        .hero-cta-outline {
-          display: inline-flex; align-items: center; gap: 10px; padding: 15px 36px;
-          background: transparent; color: #d4af37;
-          border: 2px solid rgba(212,175,55,0.4); border-radius: 50px; font-size: 15px;
-          font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif;
-          letter-spacing: 0.5px; transition: all 0.4s cubic-bezier(.22,1,.36,1);
-        }
-        .hero-cta-outline:hover {
-          transform: translateY(-3px); border-color: #d4af37;
-          background: rgba(212,175,55,0.08);
-        }
+        .footer-link { color: ${C.footerText}; text-decoration: none; transition: color 0.2s ease; }
+        .footer-link:hover { color: ${C.rustLight}; }
 
-        .section-title {
-          font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 52px);
-          font-weight: 900; margin-bottom: 16px; position: relative; display: inline-block;
-        }
-        .section-title::after {
-          content: ''; position: absolute; bottom: -8px; left: 0; width: 60px; height: 3px;
-          background: linear-gradient(90deg, #d4af37, transparent); border-radius: 2px;
-        }
+        a:focus-visible, button:focus-visible { outline: 2px solid ${C.rust}; outline-offset: 3px; }
+        footer a:focus-visible { outline-color: ${C.rustLight}; }
 
-        .stat-card {
-          text-align: center; padding: 24px;
-          background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(255,255,255,0.02));
-          border: 1px solid rgba(212,175,55,0.1); border-radius: 16px;
-          transition: all 0.4s ease;
-        }
-        .stat-card:hover {
-          transform: translateY(-4px); border-color: rgba(212,175,55,0.25);
-          box-shadow: 0 8px 30px rgba(212,175,55,0.1);
-        }
-
-        .contact-input {
-          width: 100%; padding: 14px 20px; background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(212,175,55,0.15); border-radius: 12px; color: #e8e0d0;
-          font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none;
-          transition: all 0.3s ease;
-        }
-        .contact-input:focus {
-          border-color: #d4af37; box-shadow: 0 0 20px rgba(212,175,55,0.1);
-          background: rgba(255,255,255,0.06);
-        }
-        .contact-input::placeholder { color: #666; }
-
-        .contact-submit {
-          width: 100%; padding: 16px; background: linear-gradient(135deg, #d4af37, #c49b2a);
-          color: #0a0a0a; border: none; border-radius: 12px; font-size: 16px;
-          font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif;
-          transition: all 0.4s ease; letter-spacing: 0.5px;
-        }
-        .contact-submit:hover {
-          box-shadow: 0 8px 30px rgba(212,175,55,0.4); transform: translateY(-2px);
-        }
-
-        .hamburger {
-          display: none; background: none; border: none; cursor: pointer; padding: 8px;
-          z-index: 1001;
-        }
-        .hamburger span {
-          display: block; width: 24px; height: 2px; background: #d4af37;
-          margin: 5px 0; transition: all 0.3s ease; border-radius: 2px;
-        }
-
-        @media (max-width: 768px) {
-          .hamburger { display: block; }
-          .desktop-nav { display: none !important; }
-          .mobile-menu {
-            position: fixed; top: 0; right: 0; width: 280px; height: 100vh;
-            background: rgba(10,10,10,0.98); backdrop-filter: blur(20px);
-            display: flex; flex-direction: column; padding: 80px 30px 30px;
-            gap: 8px; z-index: 1000; border-left: 1px solid rgba(212,175,55,0.1);
-            transform: translateX(100%); transition: transform 0.4s cubic-bezier(.22,1,.36,1);
-          }
-          .mobile-menu.open { transform: translateX(0); }
-          .mobile-menu .nav-link {
-            font-size: 16px; text-align: left; padding: 12px 16px;
-          }
+        @media (prefers-reduced-motion: reduce) {
+          html { scroll-behavior: auto; }
+          * { transition: none !important; }
         }
       `}</style>
 
-      <div className="grain-overlay" />
-      <ParticleField />
-
       {/* ─── Navigation ─── */}
-      <nav style={{
-        position: "fixed", top: 0, left: 0, right: 0, zIndex: 999, padding: "16px 40px",
-        display: "flex", justifyContent: "space-between", alignItems: "center",
-        background: scrollY > 50 ? "rgba(10,10,10,0.9)" : "transparent",
-        backdropFilter: scrollY > 50 ? "blur(20px)" : "none",
-        borderBottom: scrollY > 50 ? "1px solid rgba(212,175,55,0.08)" : "none",
-        transition: "all 0.4s ease",
+      <header style={{
+        position: "sticky", top: 0, zIndex: 10, background: "rgba(250,248,244,0.94)",
+        backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
+        borderBottom: `1px solid ${C.navRule}`,
       }}>
         <div style={{
-          fontFamily: "'Playfair Display', serif", fontSize: "22px", fontWeight: 900,
-          color: "#d4af37", cursor: "pointer", letterSpacing: "-0.5px",
-        }} onClick={() => scrollTo("hero")}>
-          R<span style={{ color: "#e8e0d0" }}>.</span>R
-        </div>
-
-        <div className="desktop-nav" style={{ display: "flex", gap: "4px", alignItems: "center" }}>
-          {navItems.map((s) => (
-            <button key={s} className={`nav-link ${activeSection === s ? "active" : ""}`}
-              onClick={() => scrollTo(s)}>
-              {t.nav[s]}
-            </button>
-          ))}
-          <div style={{ width: "1px", height: "20px", background: "rgba(255,255,255,0.1)", margin: "0 8px" }} />
-          <button className="lang-btn" onClick={() => setLang(l => l === "en" ? "fr" : "en")}>
-            {lang === "en" ? "FR" : "EN"}
-          </button>
-        </div>
-
-        <button className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
-          <span style={{ transform: menuOpen ? "rotate(45deg) translate(5px,5px)" : "none" }} />
-          <span style={{ opacity: menuOpen ? 0 : 1 }} />
-          <span style={{ transform: menuOpen ? "rotate(-45deg) translate(5px,-5px)" : "none" }} />
-        </button>
-      </nav>
-
-      {/* Mobile menu */}
-      <div className={`mobile-menu ${menuOpen ? "open" : ""}`}>
-        {navItems.map((s) => (
-          <button key={s} className={`nav-link ${activeSection === s ? "active" : ""}`}
-            onClick={() => scrollTo(s)}>{t.nav[s]}</button>
-        ))}
-        <button className="lang-btn" style={{ marginTop: "16px", alignSelf: "flex-start" }}
-          onClick={() => { setLang(l => l === "en" ? "fr" : "en"); setMenuOpen(false); }}>
-          {lang === "en" ? "FR 🇫🇷" : "EN 🇬🇧"}
-        </button>
-      </div>
-      {menuOpen && <div onClick={() => setMenuOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 998, background: "rgba(0,0,0,0.5)" }} />}
-
-      {/* ─── Hero Section ─── */}
-      <section id="hero" style={{
-        minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
-        position: "relative", padding: "120px 40px 80px", overflow: "hidden",
-      }}>
-        {/* Large decorative elements */}
-        <div style={{
-          position: "absolute", top: "-20%", right: "-10%", width: "600px", height: "600px",
-          borderRadius: "50%", border: "1px solid rgba(212,175,55,0.05)",
-          animation: "float 8s ease-in-out infinite",
-        }} />
-        <div style={{
-          position: "absolute", bottom: "-10%", left: "-5%", width: "400px", height: "400px",
-          borderRadius: "50%", background: "radial-gradient(circle, rgba(212,175,55,0.04) 0%, transparent 70%)",
-          animation: "float 12s ease-in-out infinite reverse",
-        }} />
-
-        <div style={{ maxWidth: "900px", position: "relative", zIndex: 2, textAlign: "center" }}>
-          <p style={{
-            fontFamily: "'JetBrains Mono', monospace", fontSize: "14px", color: "#d4af37",
-            marginBottom: "20px", letterSpacing: "4px", textTransform: "uppercase",
-            opacity: heroLoaded ? 1 : 0, transform: heroLoaded ? "translateY(0)" : "translateY(20px)",
-            transition: "all 0.8s cubic-bezier(.22,1,.36,1) 0.2s",
+          ...container, padding: "14px 24px", display: "flex", flexWrap: "wrap", alignItems: "center",
+          justifyContent: "space-between", gap: "12px 24px",
+        }}>
+          <a href="#top" style={{
+            fontFamily: F.serif, fontSize: "24px", fontWeight: 600, color: C.ink,
+            letterSpacing: "-0.01em", textDecoration: "none",
           }}>
-            {t.hero.greeting}
-          </p>
-          <h1 style={{
-            fontFamily: "'Playfair Display', serif", fontSize: "clamp(48px, 8vw, 96px)",
-            fontWeight: 900, lineHeight: 1, marginBottom: "8px",
-            background: "linear-gradient(135deg, #d4af37 0%, #f5e6a3 40%, #d4af37 60%, #b8941f 100%)",
-            backgroundSize: "200% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-            animation: "text-shimmer 4s linear infinite",
-            opacity: heroLoaded ? 1 : 0, transform: heroLoaded ? "translateY(0)" : "translateY(30px)",
-            transition: "all 0.8s cubic-bezier(.22,1,.36,1) 0.4s",
+            R. Ramanampamonjy
+          </a>
+          <nav aria-label="Navigation" style={{
+            display: "flex", flexWrap: "wrap", alignItems: "center", gap: "4px 22px",
+            fontSize: "15px", fontWeight: 500,
           }}>
-            {t.hero.name}
-          </h1>
-          <h2 style={{
-            fontFamily: "'Playfair Display', serif", fontSize: "clamp(24px, 4vw, 44px)",
-            fontWeight: 400, color: "#c0b89a", lineHeight: 1.2, marginBottom: "24px",
-            opacity: heroLoaded ? 1 : 0, transform: heroLoaded ? "translateY(0)" : "translateY(30px)",
-            transition: "all 0.8s cubic-bezier(.22,1,.36,1) 0.6s",
-          }}>
-            {t.hero.surname}
-          </h2>
-
-          <div style={{
-            display: "inline-block", padding: "8px 28px", borderRadius: "30px",
-            border: "1px solid rgba(212,175,55,0.3)", marginBottom: "28px",
-            background: "rgba(212,175,55,0.06)",
-            opacity: heroLoaded ? 1 : 0, transform: heroLoaded ? "translateY(0)" : "translateY(20px)",
-            transition: "all 0.8s cubic-bezier(.22,1,.36,1) 0.8s",
-          }}>
-            <span style={{
-              fontFamily: "'JetBrains Mono', monospace", fontSize: "14px", color: "#d4af37",
-              letterSpacing: "3px", textTransform: "uppercase", fontWeight: 500,
+            {navItems.map((s) => (
+              <a key={s} href={`#${s}`} className="nav-link">{t.nav[s]}</a>
+            ))}
+            <div role="group" aria-label="Langue / Language" style={{
+              display: "flex", border: `1px solid ${C.ink}`, borderRadius: "999px", padding: "3px", gap: "2px",
             }}>
-              {t.hero.role}
-            </span>
-          </div>
-
-          <p style={{
-            fontSize: "clamp(15px, 2vw, 18px)", color: "#999", maxWidth: "600px",
-            margin: "0 auto 40px", lineHeight: 1.8, fontWeight: 300,
-            opacity: heroLoaded ? 1 : 0, transform: heroLoaded ? "translateY(0)" : "translateY(20px)",
-            transition: "all 0.8s cubic-bezier(.22,1,.36,1) 1s",
-          }}>
-            {t.hero.subtitle}
-          </p>
-
-          <div style={{
-            display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap",
-            opacity: heroLoaded ? 1 : 0, transform: heroLoaded ? "translateY(0)" : "translateY(20px)",
-            transition: "all 0.8s cubic-bezier(.22,1,.36,1) 1.2s",
-          }}>
-            <button className="hero-cta" onClick={() => scrollTo("experience")}>
-              {t.hero.cta} <span style={{ fontSize: "18px" }}>↓</span>
-            </button>
-            <a className="hero-cta-outline" href={process.env.PUBLIC_URL + "/cv.pdf"} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
-              {t.hero.download} <span style={{ fontSize: "16px" }}>📄</span>
-            </a>
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div style={{
-          position: "absolute", bottom: "40px", left: "50%", transform: "translateX(-50%)",
-          display: "flex", flexDirection: "column", alignItems: "center", gap: "8px",
-          opacity: heroLoaded ? 0.5 : 0, transition: "opacity 1s ease 1.5s",
-        }}>
-          <div style={{
-            width: "24px", height: "40px", borderRadius: "12px",
-            border: "2px solid rgba(212,175,55,0.3)", position: "relative",
-          }}>
-            <div style={{
-              width: "4px", height: "8px", borderRadius: "2px", background: "#d4af37",
-              position: "absolute", left: "50%", top: "8px", transform: "translateX(-50%)",
-              animation: "float 2s ease-in-out infinite",
-            }} />
-          </div>
-        </div>
-      </section>
-
-      {/* ─── About Section ─── */}
-      <section id="about" ref={aboutRef} style={{
-        padding: "100px 40px", maxWidth: "1100px", margin: "0 auto", position: "relative", zIndex: 2,
-      }}>
-        <div style={{
-          opacity: aboutInView ? 1 : 0, transform: aboutInView ? "translateY(0)" : "translateY(40px)",
-          transition: "all 0.8s cubic-bezier(.22,1,.36,1)",
-        }}>
-          <h2 className="section-title" style={{ color: "#e8e0d0" }}>{t.about.title}</h2>
-          <div style={{ marginTop: "40px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "30px" }}>
-            <div>
-              <p style={{ fontSize: "16px", lineHeight: 1.9, color: "#b0a890", marginBottom: "20px" }}>{t.about.p1}</p>
-              <p style={{ fontSize: "16px", lineHeight: 1.9, color: "#b0a890", marginBottom: "20px" }}>{t.about.p2}</p>
-              <p style={{ fontSize: "16px", lineHeight: 1.9, color: "#b0a890" }}>{t.about.p3}</p>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", alignContent: "start" }}>
-              {[
-                { num: "3+", label: lang === "en" ? "Years Experience" : "Ans d'expérience" },
-                { num: "3", label: lang === "en" ? "Major Projects" : "Projets majeurs" },
-                { num: "900x", label: lang === "en" ? "Performance Boost" : "Gain de performance" },
-                { num: "2", label: lang === "en" ? "Languages" : "Langues" },
-              ].map((s, i) => (
-                <div key={i} className="stat-card" style={{
-                  opacity: aboutInView ? 1 : 0, transform: aboutInView ? "translateY(0)" : "translateY(20px)",
-                  transition: `all 0.6s cubic-bezier(.22,1,.36,1) ${0.3 + i * 0.1}s`,
-                }}>
-                  <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "32px", fontWeight: 900, color: "#d4af37", marginBottom: "6px" }}>{s.num}</div>
-                  <div style={{ fontSize: "12px", color: "#888", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: "1px" }}>{s.label}</div>
-                </div>
+              {["fr", "en"].map((code) => (
+                <button key={code} type="button" aria-pressed={lang === code}
+                  className={`lang-btn ${lang === code ? "active" : ""}`}
+                  onClick={() => setLang(code)}>
+                  {code.toUpperCase()}
+                </button>
               ))}
             </div>
-          </div>
+          </nav>
         </div>
-      </section>
+      </header>
 
-      {/* ─── Skills Section ─── */}
-      <section id="skills" ref={skillsRef} style={{
-        padding: "100px 40px", position: "relative", zIndex: 2,
-        background: "linear-gradient(180deg, transparent, rgba(212,175,55,0.02), transparent)",
-      }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-          <div style={{
-            opacity: skillsInView ? 1 : 0, transform: skillsInView ? "translateY(0)" : "translateY(40px)",
-            transition: "all 0.8s cubic-bezier(.22,1,.36,1)",
+      <main id="top">
+        {/* ─── Hero ─── */}
+        <section style={{ ...container, padding: "96px 24px 0" }}>
+          <p style={{
+            margin: "0 0 28px", fontFamily: F.mono, fontSize: "13px", color: C.teal, letterSpacing: "0.04em",
           }}>
-            <h2 className="section-title" style={{ color: "#e8e0d0" }}>{t.skills.title}</h2>
-          </div>
-          <div style={{ marginTop: "40px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "32px" }}>
-            {Object.entries(skillsData).map(([cat, skills], ci) => (
-              <div key={cat} style={{
-                background: "linear-gradient(135deg, rgba(255,255,255,0.03), rgba(212,175,55,0.03))",
-                border: "1px solid rgba(212,175,55,0.08)", borderRadius: "20px", padding: "28px",
-                opacity: skillsInView ? 1 : 0, transform: skillsInView ? "translateY(0)" : "translateY(30px)",
-                transition: `all 0.7s cubic-bezier(.22,1,.36,1) ${ci * 0.15}s`,
-              }}>
-                <h3 style={{
-                  fontFamily: "'Playfair Display', serif", fontSize: "18px", color: "#d4af37",
-                  marginBottom: "20px", fontWeight: 700,
-                }}>
-                  {t.skills.categories[cat]}
-                </h3>
-                {skills.map((s, i) => (
-                  <SkillBar key={s.name} {...s} delay={ci * 0.15 + i * 0.08} inView={skillsInView} />
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Experience Section ─── */}
-      <section id="experience" ref={expRef} style={{
-        padding: "100px 40px", maxWidth: "900px", margin: "0 auto", position: "relative", zIndex: 2,
-      }}>
-        <div style={{
-          opacity: expInView ? 1 : 0, transform: expInView ? "translateY(0)" : "translateY(40px)",
-          transition: "all 0.8s cubic-bezier(.22,1,.36,1)",
-        }}>
-          <h2 className="section-title" style={{ color: "#e8e0d0" }}>{t.experience.title}</h2>
-        </div>
-        <div style={{ marginTop: "40px" }}>
-          {t.experience.jobs.map((job, i) => (
-            <TimelineCard key={i} job={job} index={i} inView={expInView} />
-          ))}
-        </div>
-      </section>
-
-      {/* ─── Education Section ─── */}
-      <section id="education" ref={eduRef} style={{
-        padding: "100px 40px", position: "relative", zIndex: 2,
-        background: "linear-gradient(180deg, transparent, rgba(212,175,55,0.02), transparent)",
-      }}>
-        <div style={{ maxWidth: "900px", margin: "0 auto" }}>
-          <div style={{
-            opacity: eduInView ? 1 : 0, transform: eduInView ? "translateY(0)" : "translateY(40px)",
-            transition: "all 0.8s cubic-bezier(.22,1,.36,1)",
+            {t.hero.kicker}
+          </p>
+          <h1 style={{
+            margin: 0, fontFamily: F.serif, fontWeight: 500, fontSize: "clamp(56px, 10vw, 128px)",
+            lineHeight: 0.92, letterSpacing: "-0.025em", color: C.ink,
           }}>
-            <h2 className="section-title" style={{ color: "#e8e0d0" }}>{t.education.title}</h2>
-          </div>
-          <div style={{ marginTop: "40px", display: "grid", gap: "24px" }}>
-            {t.education.degrees.map((d, i) => (
-              <div key={i} style={{
-                display: "flex", gap: "28px", alignItems: "flex-start",
-                background: "linear-gradient(135deg, rgba(212,175,55,0.06), rgba(255,255,255,0.02))",
-                border: "1px solid rgba(212,175,55,0.1)", borderRadius: "16px", padding: "32px",
-                opacity: eduInView ? 1 : 0, transform: eduInView ? "translateX(0)" : "translateX(-30px)",
-                transition: `all 0.7s cubic-bezier(.22,1,.36,1) ${i * 0.2}s`,
-              }}>
-                <div style={{
-                  width: "56px", height: "56px", borderRadius: "16px", flexShrink: 0,
-                  background: "linear-gradient(135deg, #d4af37, #b8941f)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: "24px", boxShadow: "0 4px 20px rgba(212,175,55,0.3)",
-                }}>
-                  🎓
-                </div>
-                <div>
-                  <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "20px", fontWeight: 700, color: "#e8e0d0", marginBottom: "4px" }}>{d.degree}</h3>
-                  <p style={{ fontSize: "14px", color: "#d4af37", fontWeight: 600, marginBottom: "4px" }}>{d.school}</p>
-                  <p style={{ fontSize: "13px", color: "#888", fontFamily: "'JetBrains Mono', monospace", marginBottom: "8px" }}>{d.period}</p>
-                  <p style={{ fontSize: "14px", color: "#b0a890" }}>{d.detail}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Contact Section ─── */}
-      <section id="contact" ref={contactRef} style={{
-        padding: "100px 40px 60px", maxWidth: "1100px", margin: "0 auto", position: "relative", zIndex: 2,
-      }}>
-        <div style={{
-          opacity: contactInView ? 1 : 0, transform: contactInView ? "translateY(0)" : "translateY(40px)",
-          transition: "all 0.8s cubic-bezier(.22,1,.36,1)",
-        }}>
-          <h2 className="section-title" style={{ color: "#e8e0d0" }}>{t.contact.title}</h2>
-          <p style={{ color: "#888", fontSize: "16px", marginTop: "24px", marginBottom: "48px" }}>{t.contact.subtitle}</p>
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "48px" }}>
-          {/* Contact Info */}
+            Riantsoa<br />Ramanampamonjy
+          </h1>
           <div style={{
-            opacity: contactInView ? 1 : 0, transform: contactInView ? "translateX(0)" : "translateX(-30px)",
-            transition: "all 0.7s cubic-bezier(.22,1,.36,1) 0.2s",
+            display: "flex", flexWrap: "wrap", gap: "32px 64px", alignItems: "flex-end",
+            justifyContent: "space-between", marginTop: "40px", paddingBottom: "40px",
+            borderBottom: `2px solid ${C.rust}`,
           }}>
-            {[
-              { icon: "✉️", label: t.contact.email, value: "ramanampamonjysandratra@gmail.com", href: "mailto:ramanampamonjysandratra@gmail.com" },
-              { icon: "📞", label: t.contact.phone, value: "+261 34 18 258 32", href: "tel:+261341825832" },
-              { icon: "📍", label: t.contact.location, value: "Antananarivo 101, Madagascar", href: null },
-              { icon: "🔗", label: t.contact.linkedin, value: "linkedin.com/in/rsandratra", href: "https://linkedin.com/in/rsandratra" },
-            ].map((c, i) => (
-              <div key={i} style={{
-                display: "flex", alignItems: "center", gap: "16px", padding: "16px 0",
-                borderBottom: "1px solid rgba(255,255,255,0.04)",
-              }}>
-                <div style={{
-                  width: "44px", height: "44px", borderRadius: "12px",
-                  background: "rgba(212,175,55,0.1)", display: "flex",
-                  alignItems: "center", justifyContent: "center", fontSize: "18px", flexShrink: 0,
-                }}>
-                  {c.icon}
-                </div>
-                <div>
-                  <div style={{ fontSize: "11px", color: "#666", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "2px" }}>{c.label}</div>
-                  {c.href ? (
-                    <a href={c.href} target="_blank" rel="noopener noreferrer" style={{ fontSize: "14px", color: "#d4af37", textDecoration: "none", fontWeight: 500, wordBreak: "break-all" }}>
-                      {c.value}
-                    </a>
-                  ) : (
-                    <span style={{ fontSize: "14px", color: "#c0b89a", fontWeight: 500 }}>{c.value}</span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Contact Form */}
-          <div style={{
-            background: "linear-gradient(135deg, rgba(212,175,55,0.06), rgba(255,255,255,0.02))",
-            border: "1px solid rgba(212,175,55,0.1)", borderRadius: "20px", padding: "32px",
-            opacity: contactInView ? 1 : 0, transform: contactInView ? "translateX(0)" : "translateX(30px)",
-            transition: "all 0.7s cubic-bezier(.22,1,.36,1) 0.3s",
-          }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              <input className="contact-input" placeholder={t.contact.namePlaceholder} />
-              <input className="contact-input" type="email" placeholder={t.contact.emailPlaceholder} />
-              <textarea className="contact-input" rows={5} placeholder={t.contact.messagePlaceholder} style={{ resize: "vertical" }} />
-              <button className="contact-submit">{t.contact.send} →</button>
+            <div style={{ flex: "999 1 520px", minWidth: 0 }}>
+              <p style={{ margin: "0 0 18px", fontSize: "26px", fontWeight: 500, color: C.rust }}>{t.hero.role}</p>
+              <p style={{ margin: 0, maxWidth: "620px", fontSize: "19px", lineHeight: 1.6, color: C.body }}>{t.hero.summary}</p>
+            </div>
+            <div style={{ flex: "1 1 260px", display: "flex", flexDirection: "column", gap: "14px" }}>
+              <a href={`mailto:${EMAIL}`} className="cta cta-solid">
+                <span>{t.hero.ctaContact}</span>
+                <ArrowRight />
+              </a>
+              <a href={LINKEDIN} target="_blank" rel="noopener noreferrer" className="cta cta-outline">
+                <span>LinkedIn</span>
+                <ArrowUpRight />
+              </a>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* ─── Footer ─── */}
-      <footer style={{
-        padding: "40px", textAlign: "center", borderTop: "1px solid rgba(212,175,55,0.08)",
-        position: "relative", zIndex: 2,
-      }}>
-        <div style={{
-          fontFamily: "'Playfair Display', serif", fontSize: "20px", fontWeight: 700,
-          color: "#d4af37", marginBottom: "12px",
-        }}>
-          R.R
-        </div>
-        <p style={{ fontSize: "13px", color: "#666", fontFamily: "'JetBrains Mono', monospace" }}>
-          {t.footer} © {new Date().getFullYear()}
-        </p>
-        <div style={{ display: "flex", justifyContent: "center", gap: "16px", marginTop: "16px" }}>
-          {["LinkedIn", "GitHub", "Email"].map((s) => (
-            <a key={s} href={s === "Email" ? "mailto:ramanampamonjysandratra@gmail.com" : s === "LinkedIn" ? "https://linkedin.com/in/rsandratra" : "#"}
-              target="_blank" rel="noopener noreferrer"
-              style={{
-                fontSize: "12px", color: "#888", textDecoration: "none",
-                fontFamily: "'JetBrains Mono', monospace", padding: "6px 14px",
-                borderRadius: "20px", border: "1px solid rgba(255,255,255,0.06)",
-                transition: "all 0.3s ease",
-              }}
-              onMouseEnter={(e) => { e.target.style.color = "#d4af37"; e.target.style.borderColor = "rgba(212,175,55,0.3)"; }}
-              onMouseLeave={(e) => { e.target.style.color = "#888"; e.target.style.borderColor = "rgba(255,255,255,0.06)"; }}
-            >
-              {s}
-            </a>
-          ))}
+          {/* Stats */}
+          <div style={{
+            display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "32px", padding: "40px 0 0",
+          }}>
+            {t.stats.map((s) => (
+              <div key={s.value} style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <span style={{ fontFamily: F.serif, fontSize: "52px", fontWeight: 600, lineHeight: 1, color: C.ink }}>{s.value}</span>
+                <span style={{ fontSize: "15px", lineHeight: 1.45, color: C.muted }}>{s.label}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ─── Selected work ─── */}
+        <section id="work" style={{ ...container, padding: "128px 24px 0" }}>
+          <SectionHeading label={t.work.label} title={t.work.title} />
+          <div style={{
+            display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "48px 40px",
+          }}>
+            {t.work.projects.map((p) => <ProjectCard key={p.name} project={p} />)}
+          </div>
+        </section>
+
+        {/* ─── Experience ─── */}
+        <section id="experience" style={{ ...container, padding: "128px 24px 0" }}>
+          <SectionHeading label={t.experience.label} title={t.experience.title} mb="24px" />
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {t.experience.jobs.map((job, i) => <ExperienceItem key={i} job={job} />)}
+          </div>
+        </section>
+
+        {/* ─── Skills ─── */}
+        <section id="skills" style={{ ...container, padding: "128px 24px 0" }}>
+          <SectionHeading label={t.skills.label} title={t.skills.title} />
+          <div style={{
+            display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "40px 32px",
+          }}>
+            {t.skills.groups.map((g) => (
+              <div key={g.label} style={{
+                display: "flex", flexDirection: "column", gap: "16px",
+                borderTop: `2px solid ${C.ink}`, paddingTop: "20px",
+              }}>
+                <h3 style={{ margin: 0, fontSize: "17px", fontWeight: 600, color: C.ink }}>{g.label}</h3>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                  {g.items.map((n) => <SkillChip key={n} name={n} />)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ─── Education + Languages ─── */}
+        <section id="education" style={{ ...container, padding: "128px 24px" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "64px" }}>
+            <div style={{ flex: "999 1 560px", minWidth: 0 }}>
+              <h2 style={{ ...sectionLabel, margin: "0 0 32px" }}>{t.education.label}</h2>
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                {t.education.degrees.map((d) => (
+                  <div key={d.degree} style={{
+                    display: "flex", flexWrap: "wrap", gap: "8px 32px", padding: "24px 0",
+                    borderTop: `1px solid ${C.rule}`,
+                  }}>
+                    <span style={{ flex: "1 1 180px", fontSize: "15px", fontStyle: "italic", color: C.warm }}>{d.period}</span>
+                    <div style={{ flex: "999 1 320px", display: "flex", flexDirection: "column", gap: "4px" }}>
+                      <span style={{ fontFamily: F.serif, fontSize: "28px", fontWeight: 600, color: C.ink }}>{d.degree}</span>
+                      <span style={{ fontSize: "16px", fontWeight: 600, color: C.teal }}>{d.school}</span>
+                      <span style={{ fontSize: "15px", lineHeight: 1.55, color: C.body }}>{d.detail}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ flex: "1 1 260px" }}>
+              <h2 style={{ ...sectionLabel, margin: "0 0 32px" }}>{t.languages.label}</h2>
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                {t.languages.list.map((x) => (
+                  <div key={x.name} style={{
+                    display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: "16px",
+                    padding: "24px 0", borderTop: `1px solid ${C.rule}`,
+                  }}>
+                    <span style={{ fontFamily: F.serif, fontSize: "28px", fontWeight: 600, color: C.ink }}>{x.name}</span>
+                    <span style={{ fontFamily: F.mono, fontSize: "14px", color: C.teal }}>{x.level}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* ─── Contact / Footer ─── */}
+      <footer id="contact" style={{ background: C.ink, color: C.footerText }}>
+        <div style={{ ...container, padding: "112px 24px 40px" }}>
+          <h2 style={{ ...sectionLabel, margin: "0 0 20px", color: C.rustLight }}>{t.contact.label}</h2>
+          <p style={{
+            margin: "0 0 48px", fontFamily: F.serif, fontSize: "clamp(44px, 7vw, 88px)", fontWeight: 500,
+            lineHeight: 1, letterSpacing: "-0.02em",
+          }}>
+            {t.contact.title}
+          </p>
+          <div style={{
+            display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "32px",
+            padding: "40px 0", borderTop: `1px solid ${C.footerRule}`, borderBottom: `1px solid ${C.footerRule}`,
+          }}>
+            {contactItems.map((c) => (
+              <div key={c.label} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <span style={{ fontFamily: F.mono, fontSize: "12px", color: C.footerMuted }}>{c.label}</span>
+                {c.href ? (
+                  <a href={c.href} className="footer-link"
+                    {...(c.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    style={{ fontSize: "18px", fontWeight: 500, wordBreak: c.breakAll ? "break-all" : "normal" }}>
+                    {c.value}
+                  </a>
+                ) : (
+                  <span style={{ fontSize: "18px", fontWeight: 500 }}>{c.value}</span>
+                )}
+              </div>
+            ))}
+          </div>
+          <div style={{
+            display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: "12px",
+            paddingTop: "28px", fontSize: "14px", color: C.footerMuted,
+          }}>
+            <span>© {new Date().getFullYear()} Riantsoa Ramanampamonjy</span>
+            <a href="#top" className="pf-link" style={{ color: C.rustLight }}>{t.contact.backTop}</a>
+          </div>
         </div>
       </footer>
     </div>
