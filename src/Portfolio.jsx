@@ -16,7 +16,7 @@ const Heading = ({ label, children }) => <div className="section-heading"><p cla
 
 const ProjectPreview = ({ index, fr }) => <div className={`project-preview preview-${index}`} aria-hidden="true">
   <div className="preview-caption"><span>{['EVAL IA', 'FAMAS', 'KILL THE TAPE'][index]}</span><span>{fr ? 'Concept d’interface' : 'Interface concept'}</span></div>
-  <div className="mock-window"><div className="mock-toolbar"><span>● ● ●</span><span>{['eval / overview', 'famas / workspace', 'catalogue / collection'][index]}</span></div><div className="mock-layout"><div className="mock-sidebar"><b>{['e.', 'F.', 'k.'][index]}</b><i/><i/><i/><i/></div><div className="mock-content"><span className="mock-eyebrow">{['EVAL IA', 'FAMAS', 'KILL THE TAPE'][index]}</span><strong>{fr ? ['Analyse des appels', 'Vue d’ensemble', 'Le catalogue'][index] : ['Call analysis', 'Overview', 'The catalogue'][index]}</strong>{index === 0 ? <><div className="audio-wave">{Array.from({length:25},(_,j)=><i key={j} style={{height:`${15+(j*29)%75}%`}}/>)}</div><div className="mock-lines"><i/><i/><i/></div></> : index === 1 ? <><div className="mock-tiles"><i/><i/><i/></div><div className="mock-table">{[0,1,2].map(n=><div key={n}><i/><i/><i/></div>)}</div></> : <div className="mock-records">{[0,1,2].map(n=><div key={n}><span/><i/></div>)}</div>}</div></div></div>
+  <img className="preview-image" src={`${process.env.PUBLIC_URL}/projects/${['eval-ia', 'famas', 'kill-the-tape'][index]}.jpg`} alt="" width="960" height="640" loading="lazy" />
 </div>;
 
 export default function Portfolio() {
